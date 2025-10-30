@@ -118,7 +118,7 @@ class AuthController extends Controller
         $user->update(['otp' => 0]);
 
         #generate token for set new password
-        $token = JWTToken::CreateTokenForResetPassword($user->id, $user->email);
+        $token = JWTToken::CreateTokenForResetPassword($user->email, $user->id);
         return response()->json([
             'status' => 'success',
             'message' => 'OTP verified successfully',
