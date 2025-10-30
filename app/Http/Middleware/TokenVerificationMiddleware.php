@@ -16,7 +16,14 @@ class TokenVerificationMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->header('token');
+        #you can use Token in Header 
+        // $token = $request->header('token');
+
+        #you can use Token in Authorization Header
+
+        $authorizationHeader = $request->header('Authorization');
+        $token = str_replace('Bearer ', '', $authorizationHeader);
+
         $result = JWTToken::VerifyToken($token);
 
         if ($result === "unauthorized") {
@@ -27,7 +34,8 @@ class TokenVerificationMiddleware
         }
 
         // Attach decoded email to request headers
-        $request->headers->set('email', $result);
+        $request->attributes->set('email', $result['email']);
+        $request->attributes->set('user_id', $result['id']);
 
         return $next($request);
     }
