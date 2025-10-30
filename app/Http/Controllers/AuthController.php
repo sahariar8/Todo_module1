@@ -47,7 +47,6 @@ class AuthController extends Controller
             ], 401);
         }
 
-
         $token = JWTToken::createToken($user->email, $user->id);
 
         return response()->json([
@@ -55,7 +54,7 @@ class AuthController extends Controller
             'message' => 'User logged in successfully',
             'access_token' => $token,
             'token_type' => 'Bearer',
-        ]);
+        ])->cookie('token', $token, time() + 60 * 24 * 30);
     }
 
     public function sendOTP(Request $request)
@@ -77,11 +76,9 @@ class AuthController extends Controller
         $otp = rand(100000, 999999);
 
         #send otp
-
         Mail::to($request->email)->send(new OTPMail($otp));
 
         #update otp into user
-
         $user->update(['otp' => $otp]);
 
         return response()->json([
@@ -140,5 +137,13 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Password Updated successfully',
         ]);
+    }
+
+    public function logout(Request $request)
+    {
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Logged out successfully'
+        ], 200)->cookie('token', '', -1);
     }
 }
